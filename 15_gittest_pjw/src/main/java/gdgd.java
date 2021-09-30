@@ -6,6 +6,7 @@ public class gdgd {
 		System.out.println("하이요 박지운씨.");
 		System.out.println("하이요 최재웅씨.");
 		System.out.println("이 십련아");
+		System.out.println("zzzz탈모정글러 ㅎㅇ");
 	}
 
 }
