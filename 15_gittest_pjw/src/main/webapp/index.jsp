@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title></title>
+<title>하이요</title>
 </head>
 <body>
 <h1>하이요</h1>
