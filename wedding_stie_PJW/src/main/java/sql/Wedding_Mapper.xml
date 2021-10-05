@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hk.ansboard">
+   <select id="boardlist" resultType="ansDto" parameterType="Map">
+      SELECT SEQ,ID,TITLE,CONTENT,REGDATE,REFER,STEP,DEPTH,READCOUNT,DELFLAG 
+      FROM ANSWERBOARD 
+      <where>
+      	<if test="seq!=null">
+      		SEQ=#{seq}
+      	</if>
+      </where> 
+      ORDER BY REFER DESC,STEP
+   </select>
+   
+   <select id="getboard" parameterType="int" resultType="ansDto">
+      SELECT SEQ,ID,TITLE,CONTENT,REGDATE,REFER,STEP,DEPTH,READCOUNT,DELFLAG 
+      FROM ANSWERBOARD 
+      WHERE SEQ=#{seq} 
+   </select>
+   
+   <insert id="insertboard" parameterType="ansDto">
+      INSERT INTO ANSWERBOARD 
+      VALUES (ANSWERBOARD_SEQ.NEXTVAL,#{id},#{title},#{content},SYSDATE 
+      ,(SELECT NVL(MAX(refer),0)+1 FROM ANSWERBOARD) , 0, 0, 0, 'N') 
+   </insert>
+   
+   <update id="updateboard" parameterType="ansDto">
+ 		UPDATE ANSWERBOARD
+      SET TITLE =#{title},CONTENT =#{content},REGDATE =SYSDATE
+      WHERE SEQ =#{seq}
+   </update>
+   
+     <update id="delboard" parameterType="Map">
+       UPDATE ANSWERBOARD
+      SET DELFLAG = 'Y'
+      WHERE SEQ IN 
+      <foreach collection="seqs"  open="(" close=")" separator="," item="seq" >  <!-- Map안에 seqs라는 이름을 꺼낸다.-->   
+<!--    for문을 통해 배열을 받아서(seqs) 하나씩 꺼내서 (5,6,7,8,...)쭉 출력을 시키게 만든다 -->
+         #{seq}
+      </foreach>
+    </update>
+   
+   <update id="readcount" parameterType="int">
+   UPDATE ANSWERBOARD
+   SET READCOUNT=READCOUNT+1
+   WHERE SEQ=#{seq}
+   </update>
+   
+   <update id="replyupdate" parameterType="ansDto">
+    <![CDATA[
+    UPDATE ANSWERBOARD 
+    SET STEP=STEP+1 
+    WHERE REFER=(SELECT REFER FROM ANSWERBOARD WHERE SEQ = #{seq})
+    AND STEP > (SELECT STEP FROM ANSWERBOARD WHERE SEQ = #{seq}) 
+   ]]>
+   </update>
+   
+   <insert id="replyinsert" parameterType="ansDto">
+   INSERT INTO ANSWERBOARD 
+              VALUES(ANSWERBOARD_SEQ.NEXTVAL,#{id},#{title},#{content},SYSDATE 
+              ,(SELECT REFER FROM ANSWERBOARD WHERE SEQ=#{seq}) 
+              ,(SELECT STEP FROM ANSWERBOARD WHERE SEQ=#{seq})+1 
+              ,(SELECT DEPTH FROM ANSWERBOARD WHERE SEQ=#{seq})+1, 0, 'N')
+   </insert>
+   
+   
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
